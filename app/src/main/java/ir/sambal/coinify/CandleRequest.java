@@ -30,7 +30,7 @@ public class CandleRequest {
         oneMonth,
     }
 
-    public static void getCandles(Coin coin, Range range) {
+    public static void getCandles(MainActivity m, Coin coin, Range range) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -78,6 +78,7 @@ public class CandleRequest {
                         double priceOpen = c.getDouble("price_open");
                         double priceClose = c.getDouble("price_close");
                         candles.add(new Candle(priceHigh, priceLow, priceOpen, priceClose));
+                        m.addCandles(coin, candles, range);
                     }
 
                 } catch (JSONException e) {
@@ -85,15 +86,5 @@ public class CandleRequest {
                 }
             }
         });
-        Log.v("JOONJOON", String.valueOf(candles));
-
-        switch (range) {
-            case weekly:
-                coin.setWeekCandles(candles);
-                break;
-            case oneMonth:
-                coin.setMonthCandles(candles);
-                break;
-        }
     }
 }

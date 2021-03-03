@@ -25,7 +25,7 @@ public class CoinRequest {
     private CoinRequest() {
     }
 
-    public static List<Coin> requestCoinData(int start, int range) {
+    public static void requestCoinData(MainActivity m, int start, int range) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -68,14 +68,13 @@ public class CoinRequest {
                         int percent_change_24h = (int) Double.parseDouble(usd.getString("percent_change_24h"));
                         int percent_change_7d = (int) Double.parseDouble(usd.getString("percent_change_7d"));
                         coins.add(new Coin(name, symbol, price, percent_change_1h, percent_change_24h, percent_change_7d));
+                        m.addCoins(coins);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
-        Log.v("JOONJOON", String.valueOf(coins));
-        return coins;
     }
 
     public static void requestCoinImage(Coin coin) {
