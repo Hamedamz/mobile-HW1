@@ -1,5 +1,8 @@
 package ir.sambal.coinify;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Coin {
     private String name;
     private String symbol;
@@ -9,6 +12,9 @@ public class Coin {
     private int percent_change_7d;
     private String imageURL;
 
+    private List<Candle> weekCandles;
+    private List<Candle> monthCandles;
+
     public Coin(String name, String symbol, int price, int percent_change_1h, int percent_change_24h, int percent_change_7d) {
         this.setName(name);
         this.setSymbol(symbol);
@@ -16,6 +22,8 @@ public class Coin {
         this.setPercent_change_1h(percent_change_1h);
         this.setPercent_change_24h(percent_change_24h);
         this.setPercent_change_7d(percent_change_7d);
+        weekCandles = new ArrayList<>();
+        monthCandles = new ArrayList<>();
     }
 
     public void setImageURL(String url) {
@@ -72,5 +80,21 @@ public class Coin {
 
     public String getImageURL() {
         return imageURL;
+    }
+
+    public List<Candle> getWeekCandles() {
+        return weekCandles;
+    }
+
+    public void setWeekCandles(List<Candle> weekCandles) {
+        this.weekCandles = weekCandles;
+    }
+
+    public List<Candle> getMonthCandles() {
+        return monthCandles;
+    }
+
+    public void setMonthCandles(List<Candle> monthCandles) {
+        this.monthCandles = monthCandles;
     }
 }

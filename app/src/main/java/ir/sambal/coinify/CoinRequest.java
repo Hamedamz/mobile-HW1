@@ -66,7 +66,6 @@ public class CoinRequest {
                         int percent_change_7d = (int) Double.parseDouble(usd.getString("percent_change_7d"));
                         coins.add(new Coin(name, symbol, price, percent_change_1h, percent_change_24h, percent_change_7d));
                     }
-                    Log.v("JSON", String.valueOf(coins));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
