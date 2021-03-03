@@ -39,7 +39,7 @@ public class CoinRequest {
 
 
         final Request request = new Request.Builder().url(url)
-                .addHeader("X-CMC_PRO_API_KEY", "4bf0fd5a-5704-4adc-a078-a0f480b17b86")
+                .addHeader("X-CMC_PRO_API_KEY", BuildConfig.X_CMC_PRO_API_KEY)
                 .build();
 
         List<Coin> coins = new ArrayList<>();
@@ -47,7 +47,7 @@ public class CoinRequest {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
+                Log.v("OKHTTP", e.getMessage());
             }
 
             @Override

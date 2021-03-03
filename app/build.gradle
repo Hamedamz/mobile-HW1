@@ -2,6 +2,10 @@ plugins {
     id 'com.android.application'
 }
 
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -14,6 +18,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "X_CoinAPI_Key", apikeyProperties['X_CoinAPI_Key'])
+        buildConfigField("String", "X_CMC_PRO_API_KEY", apikeyProperties['X_CMC_PRO_API_KEY'])
     }
 
     buildTypes {

@@ -54,7 +54,7 @@ public class CandleRequest {
         String url = urlBuilder.build().toString();
 
         final Request request = new Request.Builder().url(url)
-                .addHeader("X-CoinAPI-Key", "968BAAAE-173B-47B1-A5DB-29151BE1D2EC")
+                .addHeader("X-CoinAPI-Key", BuildConfig.X_CoinAPI_Key)
                 .build();
 
         List<Candle> candles = new ArrayList<>();
@@ -62,7 +62,7 @@ public class CandleRequest {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Log.v("TAG", e.getMessage());
+                Log.v("OKHTTP", e.getMessage());
             }
 
             @Override

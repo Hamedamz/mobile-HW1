@@ -7,21 +7,21 @@ public class Coin {
     private String name;
     private String symbol;
     private int price;
-    private int percent_change_1h;
-    private int percent_change_24h;
-    private int percent_change_7d;
+    private int percentChange1h;
+    private int percentChange24h;
+    private int percentChange7d;
     private String imageURL;
 
     private List<Candle> weekCandles;
     private List<Candle> monthCandles;
 
-    public Coin(String name, String symbol, int price, int percent_change_1h, int percent_change_24h, int percent_change_7d) {
+    public Coin(String name, String symbol, int price, int percentChange1h, int percentChange24h, int percentChange7d) {
         this.setName(name);
         this.setSymbol(symbol);
         this.setPrice(price);
-        this.setPercent_change_1h(percent_change_1h);
-        this.setPercent_change_24h(percent_change_24h);
-        this.setPercent_change_7d(percent_change_7d);
+        this.setPercentChange1h(percentChange1h);
+        this.setPercentChange24h(percentChange24h);
+        this.setPercentChange7d(percentChange7d);
         weekCandles = new ArrayList<>();
         monthCandles = new ArrayList<>();
     }
@@ -54,28 +54,28 @@ public class Coin {
         this.price = price;
     }
 
-    public int getPercent_change_1h() {
-        return percent_change_1h;
+    public int getPercentChange1h() {
+        return percentChange1h;
     }
 
-    public void setPercent_change_1h(int percent_change_1h) {
-        this.percent_change_1h = percent_change_1h;
+    public void setPercentChange1h(int percentChange1h) {
+        this.percentChange1h = percentChange1h;
     }
 
-    public int getPercent_change_24h() {
-        return percent_change_24h;
+    public int getPercentChange24h() {
+        return percentChange24h;
     }
 
-    public void setPercent_change_24h(int percent_change_24h) {
-        this.percent_change_24h = percent_change_24h;
+    public void setPercentChange24h(int percentChange24h) {
+        this.percentChange24h = percentChange24h;
     }
 
-    public int getPercent_change_7d() {
-        return percent_change_7d;
+    public int getPercentChange7d() {
+        return percentChange7d;
     }
 
-    public void setPercent_change_7d(int percent_change_7d) {
-        this.percent_change_7d = percent_change_7d;
+    public void setPercentChange7d(int percentChange7d) {
+        this.percentChange7d = percentChange7d;
     }
 
     public String getImageURL() {
