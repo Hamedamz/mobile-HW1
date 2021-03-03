@@ -22,12 +22,15 @@ import okhttp3.Response;
 
 public class CandleRequest {
 
+    private CandleRequest() {
+    }
+
     public enum Range {
         weekly,
         oneMonth,
     }
 
-    public void getCandles(Coin coin, Range range) {
+    public static void getCandles(Coin coin, Range range) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -82,6 +85,7 @@ public class CandleRequest {
                 }
             }
         });
+        Log.v("JOONJOON", String.valueOf(candles));
 
         switch (range) {
             case weekly:

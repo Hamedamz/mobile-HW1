@@ -22,7 +22,10 @@ import okhttp3.Response;
 
 public class CoinRequest {
 
-    public List<Coin> requestCoinData(int start, int range) {
+    private CoinRequest() {
+    }
+
+    public static List<Coin> requestCoinData(int start, int range) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -71,10 +74,11 @@ public class CoinRequest {
                 }
             }
         });
+        Log.v("JOONJOON", String.valueOf(coins));
         return coins;
     }
 
-    public void requestCoinImage(Coin coin) {
+    public static void requestCoinImage(Coin coin) {
         OkHttpClient okHttpClient = new OkHttpClient();
 
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse("https://pro-api.coinmarketcap.com/v1/cryptocurrency/info"))
