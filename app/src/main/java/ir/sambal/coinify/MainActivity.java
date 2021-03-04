@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -45,7 +46,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         loadMoreCoins();
+        Button moreBtn = findViewById(R.id.more_btn);
+        moreBtn.setOnClickListener(v -> loadMoreCoins());
+        Button reloadBtn = findViewById(R.id.reload_btn);
+        reloadBtn.setOnClickListener(v -> reloadCoins());
+
         Thread thread = new Thread(() -> {
             Log.i("ME", "Shoro shod!");
             try {
@@ -84,6 +91,11 @@ public class MainActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 
+    }
+
+    private void reloadCoins() {
+        coins.clear();
+        loadMoreCoins();
     }
 
     public synchronized void loadMoreCoins() {
