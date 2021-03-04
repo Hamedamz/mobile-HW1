@@ -68,8 +68,8 @@ public class CoinRequest {
                         int percent_change_24h = (int) Double.parseDouble(usd.getString("percent_change_24h"));
                         int percent_change_7d = (int) Double.parseDouble(usd.getString("percent_change_7d"));
                         coins.add(new Coin(name, symbol, price, percent_change_1h, percent_change_24h, percent_change_7d));
-                        m.addCoins(coins);
                     }
+                    m.addCoins(coins);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -89,7 +89,7 @@ public class CoinRequest {
 
 
         final Request request = new Request.Builder().url(url)
-                .addHeader("X-CMC_PRO_API_KEY", "4bf0fd5a-5704-4adc-a078-a0f480b17b86")
+                .addHeader("X-CMC_PRO_API_KEY", BuildConfig.X_CMC_PRO_API_KEY)
                 .build();
 
         okHttpClient.newCall(request).enqueue(new Callback() {
