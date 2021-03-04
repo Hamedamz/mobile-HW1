@@ -7,20 +7,28 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ListView listView;
     private String[] listItem;
 
+    public static final int COIN_LOAD_NO = 10;
+
     private List<Coin> coins = new ArrayList<>();
 
     public void addCoins(List<Coin> coins) {
-        this.coins = coins;
+        for (int i = 0; i < COIN_LOAD_NO; i++) {
+            Coin c = coins.get(i);
+            CoinRequest.requestCoinImage(c);
+        }
+        this.coins.addAll(coins);
     }
 
     public void addCandles(Coin coin, List<Candle> candles, CandleRequest.Range range) {
@@ -38,6 +46,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        loadMoreCoins();
+        Button moreBtn = findViewById(R.id.more_btn);
+        moreBtn.setOnClickListener(v -> loadMoreCoins());
+        Button reloadBtn = findViewById(R.id.reload_btn);
+        reloadBtn.setOnClickListener(v -> reloadCoins());
+
         Thread thread = new Thread(() -> {
             Log.i("ME", "Shoro shod!");
             try {
@@ -76,5 +91,15 @@ public class MainActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 
+    }
+
+    private void reloadCoins() {
+        coins.clear();
+        loadMoreCoins();
+    }
+
+    public synchronized void loadMoreCoins() {
+        int index = this.coins.size() + 1;
+        CoinRequest.requestCoinData(this, index, COIN_LOAD_NO);
     }
 }
