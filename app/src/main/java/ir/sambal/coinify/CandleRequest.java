@@ -78,8 +78,9 @@ public class CandleRequest {
                         double priceOpen = c.getDouble("price_open");
                         double priceClose = c.getDouble("price_close");
                         candles.add(new Candle(priceHigh, priceLow, priceOpen, priceClose));
-                        m.addCandles(coin, candles, range);
                     }
+                    m.addCandles(coin, candles, range);
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
