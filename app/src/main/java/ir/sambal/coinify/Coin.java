@@ -97,4 +97,14 @@ public class Coin {
     public void setMonthCandles(List<Candle> monthCandles) {
         this.monthCandles = monthCandles;
     }
+
+    public List<Candle> getCandles(CandleRequest.Range range) {
+        switch (range) {
+            case weekly:
+                return weekCandles;
+            case oneMonth:
+                return monthCandles;
+        }
+        return null;
+    }
 }
