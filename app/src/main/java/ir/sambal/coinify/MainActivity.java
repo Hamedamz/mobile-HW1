@@ -2,6 +2,7 @@ package ir.sambal.coinify;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,16 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final List<Coin> coins = new ArrayList<>();
 
-    public void addCandles(Coin coin, List<Candle> candles, CandleRequest.Range range) {
-        switch (range) {
-            case weekly:
-                coin.setWeekCandles(candles);
-                break;
-            case oneMonth:
-                coin.setMonthCandles(candles);
-                break;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +50,15 @@ public class MainActivity extends AppCompatActivity {
         moreBtn.setOnClickListener(v -> loadMoreCoins());
         Button reloadBtn = findViewById(R.id.reload_btn);
         reloadBtn.setOnClickListener(v -> reloadCoins());
+        Button chartBtn = findViewById(R.id.tmp_chart);
+        chartBtn.setOnClickListener(v -> loadChartActivity());
 
+    }
+
+    private void loadChartActivity() { //TODO: pass coin on click
+        Intent intent = new Intent(this, ChartActivity.class);
+        //intent.putExtra("COIN", ); TODO: place coin here
+        startActivity(intent);
     }
 
     private void reloadCoins() {

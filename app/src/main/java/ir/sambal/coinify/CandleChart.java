@@ -18,7 +18,7 @@ import ir.sambal.coinify.network.CandleRequest;
 
 public class CandleChart {
 
-    public static void draw(MainActivity m, Coin coin, CandleRequest.Range range) {
+    public static void draw(ChartActivity m, Coin coin, CandleRequest.Range range) {
         ArrayList<CandleEntry> candleValues= new ArrayList<>();
         while (coin.getCandles(range).size() == 0) {
 
@@ -51,7 +51,7 @@ public class CandleChart {
         candleStickChart.invalidate();
     }
 
-    public static void initialize(MainActivity m) {
+    public static void initialize(ChartActivity m) {
         CandleStickChart candleStickChart = m.findViewById(R.id.candle_stick_chart);
         candleStickChart.setHighlightPerDragEnabled(true);
 

@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import ir.sambal.coinify.BuildConfig;
 import ir.sambal.coinify.Candle;
+import ir.sambal.coinify.ChartActivity;
 import ir.sambal.coinify.Coin;
 import ir.sambal.coinify.MainActivity;
 import ir.sambal.coinify.TimestampUtils;
@@ -35,7 +36,7 @@ public class CandleRequest {
         oneMonth,
     }
 
-    public static void getCandles(MainActivity m, Coin coin, Range range) {
+    public static void getCandles(ChartActivity m, Coin coin, Range range) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
