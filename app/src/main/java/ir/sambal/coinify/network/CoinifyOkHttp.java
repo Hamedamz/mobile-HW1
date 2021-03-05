@@ -11,10 +11,11 @@ import okhttp3.Request;
 
 public class CoinifyOkHttp {
     public static OkHttpClient create(Context context) {
-        return new OkHttpClient.Builder().cache(new Cache(
+        Cache cache = new Cache(
                 new File(context.getApplicationContext().getCacheDir(), "http_cache"),
                 50L * 1024L * 1024L // 50 MiB
-        )).addInterceptor((chain)-> {
+        );
+        return new OkHttpClient.Builder().cache(cache).addInterceptor((chain)-> {
             Request request = chain.request();
             Request newRequest;
 
