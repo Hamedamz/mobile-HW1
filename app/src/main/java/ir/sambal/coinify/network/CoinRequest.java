@@ -8,10 +8,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Objects;
 
 import ir.sambal.coinify.BuildConfig;
 import ir.sambal.coinify.Coin;
+import ir.sambal.coinify.TimestampUtils;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -21,6 +23,7 @@ import okhttp3.Response;
 
 public class CoinRequest {
     private final OkHttpClient client;
+
     public CoinRequest(OkHttpClient client) {
         this.client = client;
     }
@@ -65,7 +68,9 @@ public class CoinRequest {
                         int percent_change_1h = (int) Double.parseDouble(usd.getString("percent_change_1h"));
                         int percent_change_24h = (int) Double.parseDouble(usd.getString("percent_change_24h"));
                         int percent_change_7d = (int) Double.parseDouble(usd.getString("percent_change_7d"));
-                        coins[i] = new Coin(id, name, symbol, price, percent_change_1h, percent_change_24h, percent_change_7d);
+                        double marketCap = Double.parseDouble(usd.getString("market_cap"));
+                        Date lastUpdated = TimestampUtils.getDateForISO8601String(usd.getString("last_updated"));
+                        coins[i] = new Coin(id, name, symbol, price, percent_change_1h, percent_change_24h, percent_change_7d, marketCap, lastUpdated);
                     }
 
                     callback.onSuccess(coins);

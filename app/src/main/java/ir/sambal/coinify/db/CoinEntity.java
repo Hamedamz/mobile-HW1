@@ -3,6 +3,8 @@ package ir.sambal.coinify.db;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "coins")
 public class CoinEntity {
     @PrimaryKey
@@ -17,5 +19,6 @@ public class CoinEntity {
     public int percentChange7d;
     public String imageURL;
 
-    public int index;
+    public double marketCap;
+    public Date updatedAt;
 }

@@ -10,10 +10,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ir.sambal.coinify.db.AppDatabase;
-import ir.sambal.coinify.network.CandleRequest;
 import ir.sambal.coinify.network.CoinRequest;
 import ir.sambal.coinify.network.CoinifyOkHttp;
 import ir.sambal.coinify.repository.CoinRepository;
@@ -90,11 +90,19 @@ public class MainActivity extends AppCompatActivity {
         synchronized (coins) {
             for (int i = 0; i < coins.size(); i++) {
                 if (coins.get(i).getId() == coin.getId()) {
-                    coins.set(i, coin);
-                    return;
+                    if (coins.get(i).getLastUpdated().before(coin.getLastUpdated())) {
+                        coins.set(i, coin);
+                        return;
+                    }
                 }
             }
             coins.add(coin);
+        }
+    }
+
+    private void sortCoins() {
+        synchronized (coins) {
+            Collections.sort(coins, (c1, c2) -> c1.getLastUpdated().compareTo(c2.getLastUpdated()));
         }
     }
 
@@ -106,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     CoinRequest.requestCoinImage(c);
                     MainActivity.this.addOrUpdateCoin(c);
                 }
+                sortCoins();
                 updateCoins();
             }
         });

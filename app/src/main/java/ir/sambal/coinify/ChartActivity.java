@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.llollox.androidtoggleswitch.widgets.ToggleSwitch;
 
+import java.util.Date;
 import java.util.List;
 
 import ir.sambal.coinify.network.CandleRequest;
@@ -38,7 +39,7 @@ public class ChartActivity extends AppCompatActivity {
         chartToggle.setCheckedPosition(0);
         prevToggle = 0;
         CandleChart.initialize(this);
-        Coin c = new Coin(1, "Bitcoin", "BTC", 1, 2, 3, 4); //TODO: get coin from intent
+        Coin c = new Coin(1, "Bitcoin", "BTC", 1, 2, 3, 4, 4, new Date()); //TODO: get coin from intent
         candleRequest.getCandles(this, c, CandleRequest.Range.weekly);
         CandleChart.draw(this, c, CandleRequest.Range.weekly);
         candleRequest.getCandles(this, c, CandleRequest.Range.oneMonth);

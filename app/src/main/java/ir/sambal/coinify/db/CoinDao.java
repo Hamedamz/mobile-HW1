@@ -10,8 +10,8 @@ import java.util.List;
 
 @Dao
 public interface CoinDao {
-    @Query("SELECT * FROM coins where `index` >= :start and `index` < :end order by `index`")
-    List<CoinEntity> getAll(int start, int end);
+    @Query("SELECT * FROM coins order by `marketCap` desc limit :range offset :start")
+    List<CoinEntity> getAll(int start, int range);
 
     @Query("SELECT * FROM coins WHERE id = :id")
     List<CoinEntity> loadById(int id);
