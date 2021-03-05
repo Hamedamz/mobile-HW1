@@ -1,9 +1,14 @@
 package ir.sambal.coinify;
 
+import androidx.lifecycle.ViewModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Coin {
+import ir.sambal.coinify.network.CandleRequest;
+
+public class Coin extends ViewModel {
+    private int id;
     private String name;
     private String symbol;
     private int price;
@@ -15,7 +20,8 @@ public class Coin {
     private List<Candle> weekCandles;
     private List<Candle> monthCandles;
 
-    public Coin(String name, String symbol, int price, int percentChange1h, int percentChange24h, int percentChange7d) {
+    public Coin(int id, String name, String symbol, int price, int percentChange1h, int percentChange24h, int percentChange7d) {
+        this.setId(id);
         this.setName(name);
         this.setSymbol(symbol);
         this.setPrice(price);
@@ -24,6 +30,14 @@ public class Coin {
         this.setPercentChange7d(percentChange7d);
         weekCandles = new ArrayList<>();
         monthCandles = new ArrayList<>();
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setImageURL(String url) {

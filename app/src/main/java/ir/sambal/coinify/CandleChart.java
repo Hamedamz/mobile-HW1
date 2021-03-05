@@ -14,6 +14,8 @@ import com.github.mikephil.charting.data.CandleEntry;
 
 import java.util.ArrayList;
 
+import ir.sambal.coinify.network.CandleRequest;
+
 public class CandleChart {
 
     public static void draw(MainActivity m, Coin coin, CandleRequest.Range range) {

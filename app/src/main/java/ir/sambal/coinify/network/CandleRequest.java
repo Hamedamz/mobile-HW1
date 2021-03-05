@@ -1,4 +1,4 @@
-package ir.sambal.coinify;
+package ir.sambal.coinify.network;
 
 
 import android.util.Log;
@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import ir.sambal.coinify.BuildConfig;
+import ir.sambal.coinify.Candle;
+import ir.sambal.coinify.Coin;
+import ir.sambal.coinify.MainActivity;
+import ir.sambal.coinify.TimestampUtils;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
