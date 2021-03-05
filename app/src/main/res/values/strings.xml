@@ -2,4 +2,5 @@
     <string name="app_name">Coinify</string>
     <string name="more">more</string>
     <string name="reload">reload</string>
+    <string name="chart">chart</string>
 </resources>
