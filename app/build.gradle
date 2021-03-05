@@ -21,6 +21,13 @@ android {
 
         buildConfigField("String", "X_CoinAPI_Key", apikeyProperties['X_CoinAPI_Key'])
         buildConfigField("String", "X_CMC_PRO_API_KEY", apikeyProperties['X_CMC_PRO_API_KEY'])
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
     }
 
     buildTypes {
@@ -50,7 +57,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-    testImplementation 'junit:junit:4.+'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
@@ -60,5 +67,20 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor")
 
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
+
+    // Room
+    def room_version = "2.2.6"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    // optional - RxJava support for Room
+    implementation "androidx.room:room-rxjava2:$room_version"
+
+    // optional - Guava support for Room, including Optional and ListenableFuture
+    implementation "androidx.room:room-guava:$room_version"
+
+    // optional - Test helpers
+    testImplementation "androidx.room:room-testing:$room_version"
 
 }
