@@ -9,6 +9,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import ir.sambal.coinify.BuildConfig;
@@ -81,8 +83,7 @@ public class CoinRequest {
         });
     }
 
-    public static void requestCoinImage(Coin coin) {
-        OkHttpClient okHttpClient = new OkHttpClient();
+    public void requestCoinDetails(Coin coin, CoinDetailsResponseCallback callback) {
 
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse("https://pro-api.coinmarketcap.com/v1/cryptocurrency/info"))
                 .newBuilder();
@@ -92,13 +93,12 @@ public class CoinRequest {
         String url = urlBuilder.build().toString();
 
 
-        final Request request = new Request.Builder().url(url)
-                .addHeader("X-CMC_PRO_API_KEY", BuildConfig.X_CMC_PRO_API_KEY)
-                .build();
+        final Request request = new Request.Builder().url(url).build();
 
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                callback.onError();
                 e.printStackTrace();
             }
 
@@ -110,10 +110,11 @@ public class CoinRequest {
                     JSONObject json = new JSONObject(myResponse);
                     JSONObject data = json.getJSONObject("data");
                     JSONObject data1 = data.getJSONObject(coin.getSymbol());
-                    String logoURL = data1.getString("logo");
-                    coin.setImageURL(logoURL);
-                    Log.v("JSON", logoURL);
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("logoURL", data1.getString("logo"));
+                    callback.onSuccess(result);
                 } catch (JSONException e) {
+                    callback.onError();
                     e.printStackTrace();
                 }
             }
@@ -122,6 +123,13 @@ public class CoinRequest {
 
     public interface CoinsResponseCallback {
         void onSuccess(Coin... coins);
+
+        void onError();
+    }
+
+
+    public interface CoinDetailsResponseCallback {
+        void onSuccess(Map<String, Object> details);
 
         void onError();
     }

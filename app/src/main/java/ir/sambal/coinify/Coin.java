@@ -17,8 +17,7 @@ public class Coin {
     private int percentChange7d;
     private String imageURL;
 
-    private List<Candle> weekCandles;
-    private List<Candle> monthCandles;
+    private List<Candle> candles;
     private double marketCap;
     private Date lastUpdated;
 
@@ -32,10 +31,8 @@ public class Coin {
         this.setPercentChange1h(percentChange1h);
         this.setPercentChange24h(percentChange24h);
         this.setPercentChange7d(percentChange7d);
-        weekCandles = new ArrayList<>();
-        monthCandles = new ArrayList<>();
+        candles = new ArrayList<>();
     }
-
 
     public void setId(int id) {
         this.id = id;
@@ -117,28 +114,21 @@ public class Coin {
         this.lastUpdated = lastUpdated;
     }
 
-    public List<Candle> getWeekCandles() {
-        return weekCandles;
+    public List<Candle> getCandles() {
+        return candles;
     }
 
-    public void setWeekCandles(List<Candle> weekCandles) {
-        this.weekCandles = weekCandles;
+    public void setCandles(List<Candle> candles) {
+        this.candles = candles;
     }
 
-    public List<Candle> getMonthCandles() {
-        return monthCandles;
-    }
-
-    public void setMonthCandles(List<Candle> monthCandles) {
-        this.monthCandles = monthCandles;
-    }
 
     public List<Candle> getCandles(CandleRequest.Range range) {
         switch (range) {
             case weekly:
-                return weekCandles;
+                return candles.subList(0, Math.max(0, Math.min(7, candles.size()) - 1));
             case oneMonth:
-                return monthCandles;
+                return candles.subList(0, Math.max(0, Math.min(30, candles.size()) - 1));
         }
         return null;
     }

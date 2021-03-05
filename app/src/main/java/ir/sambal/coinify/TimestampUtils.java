@@ -16,6 +16,12 @@ public class TimestampUtils {
         return dateFormat;
     }
 
+    private static DateFormat getISO8601WithMilliDateFormat() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat;
+    }
+
     public static String getISO8601StringForCurrentDate() {
         Date now = new Date();
         return getISO8601StringForDate(now);
@@ -29,15 +35,19 @@ public class TimestampUtils {
         try {
             return getISO8601DateFormat().parse(date);
         } catch (ParseException e) {
-            e.printStackTrace();
-            return new Date();
+            try {
+                return getISO8601WithMilliDateFormat().parse(date);
+            } catch (ParseException parseException) {
+                parseException.printStackTrace();
+                return new Date();
+            }
         }
 
     }
 
-    public static Date oneDayBeforeNow() {
+    public static Date daysBeforeNow(int days) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
+        calendar.add(Calendar.DATE, -days);
         return calendar.getTime();
     }
 

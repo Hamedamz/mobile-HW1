@@ -13,12 +13,15 @@ public interface CoinDao {
     @Query("SELECT * FROM coins order by `marketCap` desc limit :range offset :start")
     List<CoinEntity> getAll(int start, int range);
 
-    @Query("SELECT * FROM coins WHERE id = :id")
-    List<CoinEntity> loadById(int id);
+    @Query("SELECT * FROM coins WHERE id = :id limit 1")
+    CoinEntity loadById(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(CoinEntity... coins);
 
     @Delete
     void delete(CoinEntity coin);
+
+    @Query("UPDATE coins set `imageURL`=:imageURL where id=:id")
+    void updateImage(int id, String imageURL);
 }

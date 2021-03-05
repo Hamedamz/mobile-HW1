@@ -2,7 +2,6 @@ package ir.sambal.coinify;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.components.Legend;
@@ -13,19 +12,18 @@ import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ir.sambal.coinify.network.CandleRequest;
 
 public class CandleChart {
 
     public static void draw(ChartActivity m, Coin coin, CandleRequest.Range range) {
-        ArrayList<CandleEntry> candleValues= new ArrayList<>();
-        while (coin.getCandles(range).size() == 0) {
-
+        ArrayList<CandleEntry> candleValues = new ArrayList<>();
+        if (coin.getCandles(range).size() == 0) {
+            return;
         }
-        ArrayList<Candle> candles = (ArrayList<Candle>) coin.getCandles(range);
-        Log.v("JOONJOON", "6");
-        Log.v("JOONJOON", String.valueOf(candles.size()));
+        List<Candle> candles = coin.getCandles(range);
 
         for (int i = 0; i < candles.size(); i++) {
             Candle c = candles.get(i);
