@@ -28,7 +28,10 @@ import okhttp3.Response;
 
 public class CandleRequest {
 
-    private CandleRequest() {
+    private OkHttpClient client;
+
+    public CandleRequest(OkHttpClient client) {
+        this.client = client;
     }
 
     public enum Range {
@@ -36,10 +39,7 @@ public class CandleRequest {
         oneMonth,
     }
 
-    public static void getCandles(ChartActivity m, Coin coin, Range range) {
-
-        OkHttpClient okHttpClient = new OkHttpClient();
-
+    public void getCandles(ChartActivity m, Coin coin, Range range) {
         String date = TimestampUtils.getISO8601StringForCurrentDate();
 
         String miniUrl;
@@ -59,13 +59,11 @@ public class CandleRequest {
 
         String url = urlBuilder.build().toString();
 
-        final Request request = new Request.Builder().url(url)
-                .addHeader("X-CoinAPI-Key", BuildConfig.X_CoinAPI_Key)
-                .build();
+        final Request request = new Request.Builder().url(url).build();
 
         List<Candle> candles = new ArrayList<>();
 
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Log.v("OKHTTP", e.getMessage());

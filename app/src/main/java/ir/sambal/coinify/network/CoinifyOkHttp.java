@@ -21,6 +21,7 @@ public class CoinifyOkHttp {
             try {
                 newRequest = request.newBuilder()
                         .addHeader("X-CMC_PRO_API_KEY", BuildConfig.X_CMC_PRO_API_KEY)
+                        .addHeader("X-CoinAPI-Key", BuildConfig.X_CoinAPI_Key)
                         .build();
             } catch (Exception e) {
                 e.printStackTrace();

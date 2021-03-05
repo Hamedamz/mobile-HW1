@@ -7,7 +7,7 @@ import java.util.List;
 
 import ir.sambal.coinify.network.CandleRequest;
 
-public class Coin extends ViewModel {
+public class Coin {
     private int id;
     private String name;
     private String symbol;
