@@ -104,7 +104,7 @@ public class CoinRequest {
                 try {
                     JSONObject json = new JSONObject(myResponse);
                     JSONObject data = json.getJSONObject("data");
-                    JSONObject data1 = data.getJSONObject("1");
+                    JSONObject data1 = data.getJSONObject(coin.getSymbol());
                     String logoURL = data1.getString("logo");
                     coin.setImageURL(logoURL);
                     Log.v("JSON", logoURL);
