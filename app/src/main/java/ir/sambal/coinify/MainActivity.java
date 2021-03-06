@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,26 +49,38 @@ public class MainActivity extends AppCompatActivity {
         moreBtn.setOnClickListener(v -> loadMoreCoins());
         Button reloadBtn = findViewById(R.id.reload_btn);
         reloadBtn.setOnClickListener(v -> reloadCoins());
-        Button chartBtn = findViewById(R.id.tmp_chart);
-        chartBtn.setOnClickListener(v -> loadChartActivity());
 
     }
 
-    private void loadChartActivity() { //TODO: pass coin on click
+    private void loadChartActivity(int coinId) {
         Intent intent = new Intent(this, ChartActivity.class);
-        //intent.putExtra("COIN", ); TODO: place coin here
+        intent.putExtra(ChartActivity.COIN_ID, coinId);
         startActivity(intent);
     }
 
     private void reloadCoins() {
-        synchronized (coins) {
-            coins.clear();
-            loadMoreCoins();
-        }
+        coinRepository.getCoins(1, COIN_LOAD_NO, (coins) -> {
+            synchronized (MainActivity.this.coins) {
+                MainActivity.this.coins.clear();
+                updateCoins(coins);
+            }
+        });
     }
 
-    public void updateCoins() {
+    public void updateCoins(Coin... newCoins) {
         synchronized (coins) {
+            for (Coin coin : newCoins) {
+                addOrUpdateCoin(coin);
+            }
+
+            Collections.sort(coins, (c1, c2) -> Double.compare(c2.getMarketCap(), c1.getMarketCap()));
+
+            for (Coin coin : coins) {
+                coinRepository.fetchCoinImageURL(coin, (imageURL -> {
+                    // pass
+                }));
+            }
+
             runOnUiThread(() -> {
                 String[] listItem = new String[coins.size()];
                 for (int i = 0; i < listItem.length; i++) {
@@ -79,8 +90,9 @@ public class MainActivity extends AppCompatActivity {
                         R.layout.mylist, R.id.textView, listItem);
                 listView.setAdapter(adapter);
                 listView.setOnItemClickListener((adapterView, view, position, l) -> {
-                    String value = adapter.getItem(position);
-                    Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+                    loadChartActivity(this.coins.get(position).getId());
+//                    String value = adapter.getItem(position);
+//                    Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
                 });
             });
         }
@@ -91,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < coins.size(); i++) {
                 if (coins.get(i).getId() == coin.getId()) {
                     if (coins.get(i).getLastUpdated().before(coin.getLastUpdated())) {
+                        // use old image is coin has image TODO: it should not be here :-\
+                        if (coins.get(i).getImageURL() == null && coin.getImageURL() != null) {
+                            coin.setImageURL(coins.get(i).getImageURL());
+                        }
                         coins.set(i, coin);
                         return;
                     }
@@ -100,22 +116,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sortCoins() {
-        synchronized (coins) {
-            Collections.sort(coins, (c1, c2) -> c1.getLastUpdated().compareTo(c2.getLastUpdated()));
-        }
-    }
-
-    public synchronized void loadMoreCoins() {
+    public void loadMoreCoins() {
         int index = this.coins.size() + 1;
         coinRepository.getCoins(index, COIN_LOAD_NO, (coins) -> {
             synchronized (MainActivity.this.coins) {
-                for (Coin c : coins) {
-                    CoinRequest.requestCoinImage(c);
-                    MainActivity.this.addOrUpdateCoin(c);
-                }
-                sortCoins();
-                updateCoins();
+                updateCoins(coins);
             }
         });
     }

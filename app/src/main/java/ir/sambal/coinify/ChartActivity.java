@@ -6,58 +6,66 @@ import android.os.Bundle;
 
 import com.llollox.androidtoggleswitch.widgets.ToggleSwitch;
 
-import java.util.Date;
-import java.util.List;
+import java.util.Arrays;
 
+import ir.sambal.coinify.db.AppDatabase;
 import ir.sambal.coinify.network.CandleRequest;
+import ir.sambal.coinify.network.CoinRequest;
 import ir.sambal.coinify.network.CoinifyOkHttp;
+import ir.sambal.coinify.repository.CandleRepository;
+import ir.sambal.coinify.repository.CoinRepository;
+import okhttp3.OkHttpClient;
 
 public class ChartActivity extends AppCompatActivity {
+    public static final String COIN_ID = "COIN_ID";
     private int prevToggle;
-    private CandleRequest candleRequest;
-
-
-    public void addCandles(Coin coin, List<Candle> candles, CandleRequest.Range range) {
-        switch (range) {
-            case weekly:
-                coin.setWeekCandles(candles);
-                break;
-            case oneMonth:
-                coin.setMonthCandles(candles);
-                break;
-        }
-    }
+    private CoinRepository coinRepository;
+    private CandleRepository candleRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart);
 
-        candleRequest = new CandleRequest(CoinifyOkHttp.create(this));
+        AppDatabase db = AppDatabase.getInstance(this);
+        OkHttpClient coinMarketClient = CoinifyOkHttp.create(this);
+        CoinRequest coinRequest = new CoinRequest(coinMarketClient);
+        coinRepository = new CoinRepository(db.coinDao(), coinRequest);
+
+        int coinId = getIntent().getIntExtra(ChartActivity.COIN_ID, -1);
+
+        CandleRequest candleRequest = new CandleRequest(CoinifyOkHttp.create(this));
+
+        candleRepository = new CandleRepository(db.candleDao(), candleRequest);
 
         ToggleSwitch chartToggle = findViewById(R.id.chart_toggle);
         chartToggle.setCheckedPosition(0);
         prevToggle = 0;
         CandleChart.initialize(this);
-        Coin c = new Coin(1, "Bitcoin", "BTC", 1, 2, 3, 4, 4, new Date()); //TODO: get coin from intent
-        candleRequest.getCandles(this, c, CandleRequest.Range.weekly);
-        CandleChart.draw(this, c, CandleRequest.Range.weekly);
-        candleRequest.getCandles(this, c, CandleRequest.Range.oneMonth);
 
-        chartToggle.setOnChangeListener(position -> {
-            if (prevToggle == position || position == -1) {
-                return;
-            }
-            switch (position) {
-                case 0:
-                    prevToggle = 0;
-                    CandleChart.draw(ChartActivity.this, c, CandleRequest.Range.weekly);
-                    break;
-                case 1:
-                    prevToggle = 1;
-                    CandleChart.draw(ChartActivity.this, c, CandleRequest.Range.oneMonth);
-                    break;
-            }
+        coinRepository.getCoin(coinId, (c) -> {
+            candleRepository.getCandles(c, (candles) -> {
+                c.setCandles(Arrays.asList(candles));
+                runOnUiThread(() -> {
+                    CandleChart.draw(this, c, CandleRequest.Range.weekly);
+                });
+            });
+
+            chartToggle.setOnChangeListener(position -> {
+                if (prevToggle == position || position == -1) {
+                    return;
+                }
+                switch (position) {
+                    case 0:
+                        prevToggle = 0;
+                        CandleChart.draw(ChartActivity.this, c, CandleRequest.Range.weekly);
+                        break;
+                    case 1:
+                        prevToggle = 1;
+                        CandleChart.draw(ChartActivity.this, c, CandleRequest.Range.oneMonth);
+                        break;
+                }
+            });
         });
     }
 }

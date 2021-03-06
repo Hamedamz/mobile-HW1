@@ -9,15 +9,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 import java.util.Objects;
 
-import ir.sambal.coinify.BuildConfig;
 import ir.sambal.coinify.Candle;
-import ir.sambal.coinify.ChartActivity;
 import ir.sambal.coinify.Coin;
-import ir.sambal.coinify.MainActivity;
 import ir.sambal.coinify.TimestampUtils;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -39,20 +35,10 @@ public class CandleRequest {
         oneMonth,
     }
 
-    public void getCandles(ChartActivity m, Coin coin, Range range) {
+    public void getCandles(Coin coin, CandlesLoadedCallback callback) {
         String date = TimestampUtils.getISO8601StringForCurrentDate();
 
-        String miniUrl;
-        switch (range) {
-            case weekly:
-                miniUrl = "period_id=1DAY".concat("&time_end=".concat(date).concat("&limit=7"));
-                break;
-            case oneMonth:
-                miniUrl = "period_id=1DAY".concat("&time_end=".concat(date).concat("&limit=30"));
-                break;
-            default:
-                miniUrl = "";
-        }
+        String miniUrl = "period_id=1DAY".concat("&time_end=".concat(date).concat("&limit=30"));
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://rest.coinapi.io/v1/ohlcv/".concat(coin.getSymbol()).concat("/USD/history?".concat(miniUrl)))
                 .newBuilder();
@@ -61,11 +47,10 @@ public class CandleRequest {
 
         final Request request = new Request.Builder().url(url).build();
 
-        List<Candle> candles = new ArrayList<>();
-
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                callback.error();
                 Log.v("OKHTTP", e.getMessage());
             }
 
@@ -75,21 +60,27 @@ public class CandleRequest {
 
                 try {
                     JSONArray json = new JSONArray(myResponse);
+                    Candle[] candles = new Candle[json.length()];
                     for (int i = 0; i < json.length(); i++) {
                         JSONObject c = json.getJSONObject(i);
+                        Date startDate = TimestampUtils.getDateForISO8601String(c.getString("time_period_start"));
                         double priceHigh = c.getDouble("price_high");
                         double priceLow = c.getDouble("price_low");
                         double priceOpen = c.getDouble("price_open");
                         double priceClose = c.getDouble("price_close");
-                        candles.add(new Candle(priceHigh, priceLow, priceOpen, priceClose));
+                        candles[i] = new Candle(startDate, priceHigh, priceLow, priceOpen, priceClose);
                     }
-                    m.addCandles(coin, candles, range);
-
-
+                    callback.success(candles);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    callback.error();
                 }
             }
         });
+    }
+
+    public interface CandlesLoadedCallback {
+        void success(Candle... candles);
+        default void error() {}
     }
 }
