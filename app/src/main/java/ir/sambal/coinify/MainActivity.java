@@ -82,17 +82,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             runOnUiThread(() -> {
-                String[] listItem = new String[coins.size()];
-                for (int i = 0; i < listItem.length; i++) {
-                    listItem[i] = coins.get(i).getName();
-                }
-                final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                        R.layout.mylist, R.id.textView, listItem);
+                final CoinAdapter adapter = new CoinAdapter(this, coins);
                 listView.setAdapter(adapter);
                 listView.setOnItemClickListener((adapterView, view, position, l) -> {
                     loadChartActivity(this.coins.get(position).getId());
-//                    String value = adapter.getItem(position);
-//                    Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
                 });
             });
         }

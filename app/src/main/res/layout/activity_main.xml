@@ -8,8 +8,9 @@
 
     <ListView
         android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent" >
+        android:layout_width="413dp"
+        android:layout_height="679dp"
+        tools:layout_editor_absoluteX="-2dp">
 
     </ListView>
 
@@ -18,14 +19,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/reload"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listView" />
 
     <Button
         android:id="@+id/more_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/more"
-        app:layout_constraintBottom_toBottomOf="@+id/listView"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
