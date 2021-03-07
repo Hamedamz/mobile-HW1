@@ -21,9 +21,11 @@ public class CoinRepository {
     }
 
     private Coin coinEntityToCoin(CoinEntity coinEntity) {
-        return new Coin(coinEntity.id, coinEntity.name, coinEntity.symbol,
+        Coin coin = new Coin(coinEntity.id, coinEntity.name, coinEntity.symbol,
                 coinEntity.price, coinEntity.percentChange1h, coinEntity.percentChange24h,
                 coinEntity.percentChange7d, coinEntity.marketCap, coinEntity.updatedAt);
+        coin.setImageURL(coinEntity.imageURL);
+        return coin;
     }
 
     // We have coin in db
@@ -61,14 +63,16 @@ public class CoinRepository {
     }
 
     public void fetchCoinImageURL(Coin coin, ImageURLResponseCallback callback) {
-        if (coin.getImageURL() == null || !coin.getImageURL().isEmpty()) {
+        if (coin.getImageURL() != null) {
             return;
         }
         new Thread(() -> {
             network.requestCoinDetails(coin, new CoinRequest.CoinDetailsResponseCallback() {
                 @Override
                 public void onSuccess(Map<String, Object> details) {
-                    db.updateImage(coin.getId(), (String) details.get("logoURL"));
+                    String imageURL = (String) details.get("logoURL");
+                    coin.setImageURL(imageURL);
+                    db.updateImage(coin.getId(), imageURL);
                     callback.getImageURL((String) details.get("logoURL"));
                 }
 

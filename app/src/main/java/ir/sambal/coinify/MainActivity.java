@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -44,6 +46,10 @@ public class MainActivity extends AppCompatActivity {
                 R.layout.mylist, R.id.textView, new String[]{});
         listView.setAdapter(adapter);
 
+        listView.setOnItemClickListener((adapterView, view, position, l) -> {
+            loadChartActivity(this.coins.get(position).getId());
+        });
+
         loadMoreCoins();
         Button moreBtn = findViewById(R.id.more_btn);
         moreBtn.setOnClickListener(v -> loadMoreCoins());
@@ -67,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     public void updateCoins(Coin... newCoins) {
         synchronized (coins) {
             for (Coin coin : newCoins) {
@@ -75,18 +82,21 @@ public class MainActivity extends AppCompatActivity {
 
             Collections.sort(coins, (c1, c2) -> Double.compare(c2.getMarketCap(), c1.getMarketCap()));
 
-            for (Coin coin : coins) {
-                coinRepository.fetchCoinImageURL(coin, (imageURL -> {
-                    // pass
-                }));
-            }
-
             runOnUiThread(() -> {
                 final CoinAdapter adapter = new CoinAdapter(this, coins);
                 listView.setAdapter(adapter);
-                listView.setOnItemClickListener((adapterView, view, position, l) -> {
-                    loadChartActivity(this.coins.get(position).getId());
-                });
+                for (int i = 0; i < coins.size(); i++) {
+                    Coin coin = coins.get(i);
+                    int finalI = i;
+                    coinRepository.fetchCoinImageURL(coin, (imageURL -> {
+                        runOnUiThread(() -> {
+                            View childView = listView.getChildAt(finalI);
+                            if (childView != null) {
+                                listView.getAdapter().getView(finalI, childView, listView);
+                            }
+                        });
+                    }));
+                }
             });
         }
     }

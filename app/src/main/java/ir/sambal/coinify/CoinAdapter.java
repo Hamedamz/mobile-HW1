@@ -32,7 +32,6 @@ public class CoinAdapter extends ArrayAdapter<Coin> {
         if (null == convertView) {
             convertView = inflater.inflate(R.layout.mylist, parent, false);
         }
-        coins.get(0).setImageURL("https://s2.coinmarketcap.com/static/img/coins/64x64/1.png");
         ((TextView) convertView.findViewById(R.id.textView)).setText(coins.get(position).getName());
         Glide.with(context).load(coins.get(position).getImageURL()).into((ImageView) convertView.findViewById(R.id.imageView));
 
