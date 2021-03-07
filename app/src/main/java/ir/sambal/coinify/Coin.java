@@ -126,9 +126,9 @@ public class Coin {
     public List<Candle> getCandles(CandleRequest.Range range) {
         switch (range) {
             case weekly:
-                return candles.subList(0, Math.max(0, Math.min(7, candles.size()) - 1));
+                return candles.subList(0, Math.max(0, Math.min(7, candles.size())));
             case oneMonth:
-                return candles.subList(0, Math.max(0, Math.min(30, candles.size()) - 1));
+                return candles.subList(0, Math.max(0, Math.min(30, candles.size())));
         }
         return null;
     }
