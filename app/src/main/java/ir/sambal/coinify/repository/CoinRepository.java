@@ -57,7 +57,7 @@ public class CoinRepository {
             if (needNetwork) {
                 loadFreshCoins(start, limit, callback);
             }
-            callback.addCoins(coins);
+            callback.addCoins(coins, !needNetwork);
         });
         cacheThread.start();
     }
@@ -78,7 +78,7 @@ public class CoinRepository {
 
                 @Override
                 public void onError() {
-
+                    // TODO:
                 }
             });
         }).start();
@@ -106,19 +106,20 @@ public class CoinRepository {
                     coinEntities[i] = coinEntity;
                 }
                 db.insertAll(coinEntities);
-                callback.addCoins(coins);
+                callback.addCoins(coins, true);
             }
 
             @Override
             public void onError() {
                 // nothing or retry?!
+                callback.addCoins(new Coin[0], true);
             }
         }));
         networkThread.start();
     }
 
     public interface CoinsResponseCallback {
-        void addCoins(Coin... coins);
+        void addCoins(Coin[] coins, boolean finalCall);
     }
 
     public interface CoinResponseCallback {
