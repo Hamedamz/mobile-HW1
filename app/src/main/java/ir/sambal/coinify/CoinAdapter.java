@@ -1,6 +1,7 @@
 package ir.sambal.coinify;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 public class CoinAdapter extends ArrayAdapter<Coin> {
+    public final static String TAG = "CoinAdapter";
     private final Context context;
     private final LayoutInflater inflater;
 
@@ -33,7 +35,11 @@ public class CoinAdapter extends ArrayAdapter<Coin> {
             convertView = inflater.inflate(R.layout.mylist, parent, false);
         }
         ((TextView) convertView.findViewById(R.id.textView)).setText(coins.get(position).getName());
-        Glide.with(context).load(coins.get(position).getImageURL()).into((ImageView) convertView.findViewById(R.id.imageView));
+        Log.d(TAG, coins.get(position).getName() + " ===> " + coins.get(position).getImageURL());
+        if (coins.get(position).getImageURL() != null) {
+            Glide.with(context).load(coins.get(position).getImageURL()).
+                    into((ImageView) convertView.findViewById(R.id.imageView));
+        }
 
         return convertView;
     }
