@@ -28,7 +28,7 @@ public class CandleRepository {
                 CandleEntity candleEntity = candleEntities.get(i);
                 candles[i] = new Candle(candleEntity.startDate, candleEntity.priceHigh, candleEntity.priceLow, candleEntity.priceOpen, candleEntity.priceClose);
             }
-            boolean needNetwork = candles.length < 30 || candles[30 - 1].getStartDate().before(TimestampUtils.daysBeforeNow(29));
+            boolean needNetwork = candles.length < 30 || candles[0].getStartDate().before(TimestampUtils.hoursBeforeNow(1));
             callback.setCandles(candles, !needNetwork);
             if (needNetwork) {
                 fetchFreshCandles(coin, callback);
