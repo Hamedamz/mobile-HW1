@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addOrUpdateCoin(Coin coin) {
         synchronized (coins) {
+            // TODO: Can we simplify it with replace?!
             for (int i = 0; i < coins.size(); i++) {
                 if (coins.get(i).getId() == coin.getId()) {
                     if (coins.get(i).getLastUpdated().before(coin.getLastUpdated())) {

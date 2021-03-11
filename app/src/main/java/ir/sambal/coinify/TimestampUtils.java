@@ -51,6 +51,12 @@ public class TimestampUtils {
         return calendar.getTime();
     }
 
+    public static Date hoursBeforeNow(int hours) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, -hours);
+        return calendar.getTime();
+    }
+
     private TimestampUtils() {
     }
 }

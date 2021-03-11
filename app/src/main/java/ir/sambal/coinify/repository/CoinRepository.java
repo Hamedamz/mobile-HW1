@@ -43,7 +43,7 @@ public class CoinRepository {
         Thread cacheThread = new Thread(() -> {
             List<CoinEntity> coinEntities = db.getAll(start - 1, limit);
             boolean needNetwork = coinEntities.size() < limit;
-            Date invalidationDate = TimestampUtils.daysBeforeNow(1);
+            Date invalidationDate = TimestampUtils.hoursBeforeNow(1);
 
             Coin[] coins = new Coin[coinEntities.size()];
             for (int i = 0; i < coinEntities.size(); i++) {
@@ -87,7 +87,7 @@ public class CoinRepository {
     public void loadFreshCoins(int start, int limit, CoinsResponseCallback callback) {
         Thread networkThread = new Thread(() -> network.requestCoinData(start, limit, new CoinRequest.CoinsResponseCallback() {
             @Override
-            public void onSuccess(Coin... coins) {
+            public void onSuccess(Coin[] coins) {
                 CoinEntity[] coinEntities = new CoinEntity[coins.length];
                 for (int i = 0; i < coins.length; i++) {
                     // TODO: kasif
