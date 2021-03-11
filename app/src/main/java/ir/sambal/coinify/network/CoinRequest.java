@@ -48,6 +48,7 @@ public class CoinRequest {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Log.v("OKHTTP", e.getMessage());
+                callback.onError();
             }
 
             @Override
@@ -77,6 +78,7 @@ public class CoinRequest {
 
                     callback.onSuccess(coins);
                 } catch (JSONException e) {
+                    callback.onError();
                     e.printStackTrace();
                 }
             }

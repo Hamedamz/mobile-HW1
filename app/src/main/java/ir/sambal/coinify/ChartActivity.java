@@ -3,6 +3,8 @@ package ir.sambal.coinify;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.llollox.androidtoggleswitch.widgets.ToggleSwitch;
 
@@ -19,6 +21,7 @@ import okhttp3.OkHttpClient;
 public class ChartActivity extends AppCompatActivity {
     public static final String COIN_ID = "COIN_ID";
     private int prevToggle;
+    private ProgressBar progressBar;
     private CoinRepository coinRepository;
     private CandleRepository candleRepository;
 
@@ -27,6 +30,7 @@ public class ChartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart);
 
+        progressBar = findViewById(R.id.indeterminateBar);
         AppDatabase db = AppDatabase.getInstance(this);
         OkHttpClient coinMarketClient = CoinifyOkHttp.create(this);
         CoinRequest coinRequest = new CoinRequest(coinMarketClient);
@@ -44,10 +48,15 @@ public class ChartActivity extends AppCompatActivity {
         CandleChart.initialize(this);
 
         coinRepository.getCoin(coinId, (c) -> {
-            candleRepository.getCandles(c, (candles) -> {
-                c.setCandles(Arrays.asList(candles));
+            candleRepository.getCandles(c, (candles, isFinalCall) -> {
+                synchronized (ChartActivity.this) {
+                    c.setCandles(Arrays.asList(candles));
+                }
                 runOnUiThread(() -> {
                     CandleChart.draw(this, c, CandleRequest.Range.weekly);
+                    if (isFinalCall) {
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
                 });
             });
 

@@ -28,8 +28,9 @@ public class CandleRepository {
                 CandleEntity candleEntity = candleEntities.get(i);
                 candles[i] = new Candle(candleEntity.startDate, candleEntity.priceHigh, candleEntity.priceLow, candleEntity.priceOpen, candleEntity.priceClose);
             }
-            callback.setCandles(candles);
-            if (candles.length < 30 || candles[30 - 1].getStartDate().before(TimestampUtils.daysBeforeNow(29))) {
+            boolean needNetwork = candles.length < 30 || candles[30 - 1].getStartDate().before(TimestampUtils.daysBeforeNow(29));
+            callback.setCandles(candles, !needNetwork);
+            if (needNetwork) {
                 fetchFreshCandles(coin, callback);
             }
         });
@@ -51,13 +52,13 @@ public class CandleRepository {
                 }
                 db.insertAll(candleEntities);
                 db.deleteOldCandles(coin.getId(), TimestampUtils.daysBeforeNow(30));
-                callback.setCandles(candles);
+                callback.setCandles(candles, true);
             });
         });
         networkThread.start();
     }
 
     public interface CandlesResponseCallback {
-        void setCandles(Candle... candles);
+        void setCandles(Candle[] candles, boolean isFinal);
     }
 }

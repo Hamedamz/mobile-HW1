@@ -4,11 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +21,7 @@ import ir.sambal.coinify.repository.CoinRepository;
 import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity {
+    private ProgressBar progressBar;
     private AppDatabase db;
     private ListView listView;
     private CoinRepository coinRepository;
@@ -35,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        progressBar = findViewById(R.id.indeterminateBar);
+        progressBar.setVisibility(View.INVISIBLE);
 
         db = AppDatabase.getInstance(this);
         OkHttpClient coinMarketClient = CoinifyOkHttp.create(this);
@@ -65,10 +69,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void reloadCoins() {
-        coinRepository.getCoins(1, COIN_LOAD_NO, (coins) -> {
+        progressBar.setVisibility(View.VISIBLE);
+
+        coinRepository.loadFreshCoins(1, COIN_LOAD_NO, (coins, isFinalCall) -> {
             synchronized (MainActivity.this.coins) {
                 MainActivity.this.coins.clear();
                 updateCoins(coins);
+                if (isFinalCall) {
+                    runOnUiThread(() -> {
+                        progressBar.setVisibility(View.INVISIBLE);
+                    });
+                }
             }
         });
     }
@@ -120,10 +131,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadMoreCoins() {
+        progressBar.setVisibility(View.VISIBLE);
         int index = this.coins.size() + 1;
-        coinRepository.getCoins(index, COIN_LOAD_NO, (coins) -> {
+        coinRepository.getCoins(index, COIN_LOAD_NO, (coins, isFinalCall) -> {
             synchronized (MainActivity.this.coins) {
                 updateCoins(coins);
+                if(isFinalCall) {
+                    runOnUiThread(() -> progressBar.setVisibility(View.INVISIBLE));
+                }
             }
         });
     }
