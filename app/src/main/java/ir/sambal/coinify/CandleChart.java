@@ -52,6 +52,7 @@ public class CandleChart {
     public static void initialize(ChartActivity m) {
         CandleStickChart candleStickChart = m.findViewById(R.id.candle_stick_chart);
         candleStickChart.setHighlightPerDragEnabled(true);
+        candleStickChart.setNoDataText(m.getResources().getString(R.string.chart_loading));
 
         candleStickChart.setDrawBorders(true);
 
@@ -64,16 +65,20 @@ public class CandleChart {
         candleStickChart.requestDisallowInterceptTouchEvent(true);
 
         XAxis xAxis = candleStickChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
         xAxis.setDrawGridLines(false);// disable x axis grid lines
-        xAxis.setDrawLabels(false);
-        rightAxis.setTextColor(Color.WHITE);
+        rightAxis.setDrawLabels(true);
         yAxis.setDrawLabels(false);
+        yAxis.setDrawLabels(false);
+
         xAxis.setGranularity(1f);
         xAxis.setGranularityEnabled(true);
         xAxis.setAvoidFirstLastClipping(true);
 
         Legend l = candleStickChart.getLegend();
         l.setEnabled(false);
+
+        candleStickChart.getDescription().setEnabled(false);
     }
 }

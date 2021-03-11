@@ -45,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
         CoinRequest coinRequest = new CoinRequest(coinMarketClient);
         coinRepository = new CoinRepository(db.coinDao(), coinRequest);
 
-        listView = findViewById(R.id.listView);
+        listView = findViewById(R.id.coin_list);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                R.layout.mylist, R.id.textView, new String[]{});
+                R.layout.coin_card, R.id.coin_name, new String[]{});
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener((adapterView, view, position, l) -> {
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         coinRepository.getCoins(index, COIN_LOAD_NO, (coins, isFinalCall) -> {
             synchronized (MainActivity.this.coins) {
                 updateCoins(coins);
-                if(isFinalCall) {
+                if (isFinalCall) {
                     runOnUiThread(() -> progressBar.setVisibility(View.INVISIBLE));
                 }
             }

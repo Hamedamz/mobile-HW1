@@ -8,4 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="mask_background">#CD000000</color>
+
+    <color name="price_nochange">@color/gray</color>
+    <color name="price_increase">#1B9A21</color>
+    <color name="price_decrease">#BC0C0C</color>
 </resources>

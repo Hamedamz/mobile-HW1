@@ -54,7 +54,9 @@ public class ChartActivity extends AppCompatActivity {
                 }
                 runOnUiThread(() -> {
                     CandleChart.draw(this, c, CandleRequest.Range.weekly);
-                    progressBar.setVisibility(View.INVISIBLE);
+                    if (isFinalCall) {
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
                 });
             });
 
