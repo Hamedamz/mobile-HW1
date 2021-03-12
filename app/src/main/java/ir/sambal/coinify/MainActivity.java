@@ -1,13 +1,20 @@
 package ir.sambal.coinify;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.os.HandlerCompat;
 
 import android.content.Context;
 import android.content.Intent;
+
 import android.net.Network;
+
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
+
 import android.view.View;
+
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -26,9 +33,14 @@ import ir.sambal.coinify.network.CoinRequest;
 import ir.sambal.coinify.network.CoinifyOkHttp;
 import ir.sambal.coinify.network.NetworkStatus;
 import ir.sambal.coinify.repository.CoinRepository;
+import ir.sambal.coinify.thread.ThreadPoolManager;
 import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity implements DroidListener {
+
+    private Handler mainThreadHandler  = HandlerCompat.createAsync(Looper.getMainLooper());
+    private ThreadPoolManager threadPoolManager = ThreadPoolManager.getInstance();
+
     private ProgressBar progressBar;
     private AppDatabase db;
     private ListView listView;
@@ -57,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
         db = AppDatabase.getInstance(this);
         OkHttpClient coinMarketClient = CoinifyOkHttp.create(this);
         CoinRequest coinRequest = new CoinRequest(coinMarketClient);
-        coinRepository = new CoinRepository(db.coinDao(), coinRequest);
+        coinRepository = new CoinRepository(db.coinDao(), coinRequest, threadPoolManager, mainThreadHandler);
 
         listView = findViewById(R.id.coin_list);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
@@ -104,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
                 MainActivity.this.coins.clear();
                 updateCoins(coins);
                 if (isFinalCall) {
-                    runOnUiThread(() -> {
+//                    runOnUiThread(() -> {
                         progressBar.setVisibility(View.INVISIBLE);
-                    });
+//                    });
                 }
             }
         });
@@ -139,22 +151,22 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
 
             Collections.sort(coins, (c1, c2) -> Double.compare(c2.getMarketCap(), c1.getMarketCap()));
 
-            runOnUiThread(() -> {
+//            runOnUiThread(() -> {
                 final CoinAdapter adapter = new CoinAdapter(this, coins);
                 listView.setAdapter(adapter);
                 for (int i = 0; i < coins.size(); i++) {
                     Coin coin = coins.get(i);
                     int finalI = i;
                     coinRepository.fetchCoinImageURL(coin, (imageURL -> {
-                        runOnUiThread(() -> {
+//                        runOnUiThread(() -> {
                             View childView = listView.getChildAt(finalI);
                             if (childView != null) {
                                 listView.getAdapter().getView(finalI, childView, listView);
                             }
-                        });
+//                        });
                     }));
                 }
-            });
+//            });
         }
     }
 
@@ -184,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
             synchronized (MainActivity.this.coins) {
                 updateCoins(coins);
                 if (isFinalCall) {
-                    runOnUiThread(() -> progressBar.setVisibility(View.INVISIBLE));
+//                    runOnUiThread(() -> progressBar.setVisibility(View.INVISIBLE));
+                    progressBar.setVisibility(View.INVISIBLE);
                 }
             }
         });
