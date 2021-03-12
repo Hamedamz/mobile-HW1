@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import ir.sambal.coinify.BuildConfig;
 import ir.sambal.coinify.Coin;
 import ir.sambal.coinify.TimestampUtils;
 import okhttp3.Call;
@@ -24,7 +23,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class CoinRequest {
+    private static final String tag = "OKHTTP_COINS";
     private final OkHttpClient client;
+
+    public enum RequestError {
+        PARSE_ERROR, BAD_REQUEST, SERVER_ERROR, CONNECTION_ERROR;
+    }
 
     public CoinRequest(OkHttpClient client) {
         this.client = client;
@@ -47,12 +51,21 @@ public class CoinRequest {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Log.v("OKHTTP", e.getMessage());
-                callback.onError();
+                Log.w(tag, e);
+                callback.onError(RequestError.CONNECTION_ERROR);
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
+                if (response.code() >= 500) {
+                    callback.onError(RequestError.SERVER_ERROR);
+                    return;
+                }
+                if (response.code() >= 400) {
+                    callback.onError(RequestError.BAD_REQUEST);
+                    return;
+                }
+
                 final String myResponse = Objects.requireNonNull(response.body()).string();
 
                 try {
@@ -78,8 +91,8 @@ public class CoinRequest {
 
                     callback.onSuccess(coins);
                 } catch (JSONException e) {
-                    callback.onError();
-                    e.printStackTrace();
+                    callback.onError(RequestError.PARSE_ERROR);
+                    Log.w(tag, e);
                 }
             }
         });
@@ -100,12 +113,20 @@ public class CoinRequest {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                callback.onError();
-                e.printStackTrace();
+                callback.onError(RequestError.CONNECTION_ERROR);
+                Log.w(tag, e);
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
+                if (response.code() >= 500) {
+                    callback.onError(RequestError.SERVER_ERROR);
+                    return;
+                }
+                if (response.code() >= 400) {
+                    callback.onError(RequestError.BAD_REQUEST);
+                    return;
+                }
                 final String myResponse = Objects.requireNonNull(response.body()).string();
 
                 try {
@@ -116,8 +137,8 @@ public class CoinRequest {
                     result.put("logoURL", data1.getString("logo"));
                     callback.onSuccess(result);
                 } catch (JSONException e) {
-                    callback.onError();
-                    e.printStackTrace();
+                    callback.onError(RequestError.PARSE_ERROR);
+                    Log.w(tag, e);
                 }
             }
         });
@@ -126,14 +147,15 @@ public class CoinRequest {
     public interface CoinsResponseCallback {
         void onSuccess(Coin... coins);
 
-        void onError();
+        void onError(RequestError error);
     }
 
 
     public interface CoinDetailsResponseCallback {
+
         void onSuccess(Map<String, Object> details);
 
-        void onError();
+        void onError(RequestError error);
     }
 
 }

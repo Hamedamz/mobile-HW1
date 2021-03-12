@@ -4,4 +4,11 @@
     <string name="reload">reload</string>
     <string name="chart">chart</string>
     <string name="chart_loading">Loading...</string>
+    <string name="coin_not_found">این سکه در پایگاه داده یافت نشد :(</string>
+    <string name="chart_no_data">No Candles Available</string>
+    <string name="connection_error_please_retry">ارتباط با سرور برقرار نشد، لطفا وضعیت اینترنت خود را بررسی کنید</string>
+    <string name="server_error_please_retry">یک مشکل سمت سرور پیش آمده است، معذرت می‌خواهیم :( لطفا دوباره تلاش کنید.</string>
+    <string name="unknown_error_contact_support">یک خطای ناشناخته رخ داده است :-\\ لطفا دوباره تلاش کنید و یا با پشتیبانی تماس بگیرید.</string>
+    <string name="please_wait">به کجا چنین شتابان...</string>
+    <string name="no_network">No Network!</string>
 </resources>
