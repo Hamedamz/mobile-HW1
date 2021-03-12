@@ -39,7 +39,7 @@ import okhttp3.OkHttpClient;
 public class MainActivity extends AppCompatActivity implements DroidListener {
 
     private Handler mainThreadHandler  = HandlerCompat.createAsync(Looper.getMainLooper());
-    private ThreadPoolManager threadPoolManager = ThreadPoolManager.getInstance();;
+    private ThreadPoolManager threadPoolManager = ThreadPoolManager.getInstance();
 
     private ProgressBar progressBar;
     private AppDatabase db;
