@@ -116,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
                 MainActivity.this.coins.clear();
                 updateCoins(coins);
                 if (isFinalCall) {
-                    runOnUiThread(() -> {
+//                    runOnUiThread(() -> {
                         progressBar.setVisibility(View.INVISIBLE);
-                    });
+//                    });
                 }
             }
         });
@@ -151,22 +151,22 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
 
             Collections.sort(coins, (c1, c2) -> Double.compare(c2.getMarketCap(), c1.getMarketCap()));
 
-            runOnUiThread(() -> {
+//            runOnUiThread(() -> {
                 final CoinAdapter adapter = new CoinAdapter(this, coins);
                 listView.setAdapter(adapter);
                 for (int i = 0; i < coins.size(); i++) {
                     Coin coin = coins.get(i);
                     int finalI = i;
                     coinRepository.fetchCoinImageURL(coin, (imageURL -> {
-                        runOnUiThread(() -> {
+//                        runOnUiThread(() -> {
                             View childView = listView.getChildAt(finalI);
                             if (childView != null) {
                                 listView.getAdapter().getView(finalI, childView, listView);
                             }
-                        });
+//                        });
                     }));
                 }
-            });
+//            });
         }
     }
 
@@ -196,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
             synchronized (MainActivity.this.coins) {
                 updateCoins(coins);
                 if (isFinalCall) {
-                    runOnUiThread(() -> progressBar.setVisibility(View.INVISIBLE));
+//                    runOnUiThread(() -> progressBar.setVisibility(View.INVISIBLE));
+                    progressBar.setVisibility(View.INVISIBLE);
                 }
             }
         });
