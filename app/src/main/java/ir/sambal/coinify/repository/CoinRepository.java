@@ -13,6 +13,7 @@ import ir.sambal.coinify.db.CoinEntity;
 import ir.sambal.coinify.db.CoinDao;
 import ir.sambal.coinify.network.CoinRequest;
 import ir.sambal.coinify.thread.ThreadPoolManager;
+import ir.sambal.coinify.network.NetworkStatus;
 
 public class CoinRepository {
     private final CoinDao db;
@@ -50,7 +51,7 @@ public class CoinRepository {
     }
 
 
-    public void getCoins(int start, int limit, CoinsResponseCallback callback) {
+    public void getCoins(int start, int limit, NetworkStatus networkStatus, CoinsResponseCallback callback) {
         threadPoolManager.addRunnable(new Runnable() {
             @Override
             public void run() {
@@ -67,12 +68,11 @@ public class CoinRepository {
                         needNetwork = true;
                     }
                 }
-                if (needNetwork) {
+
+                if (needNetwork && networkStatus == NetworkStatus.CONNECTED) {
                     loadFreshCoins(start, limit, callback);
                 }
-
                 callback.addCoins(coins, !needNetwork);
-            }
         });
     }
 
