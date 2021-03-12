@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Network;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
     private DroidNet mDroidNet;
     public NetworkStatus networkStatus;
 
+    private long mLastClickTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,12 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
     }
 
     private void reloadCoins() {
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 2000) {
+            notYetToast();
+            return;
+        }
+        mLastClickTime = SystemClock.elapsedRealtime();
+
         progressBar.setVisibility(View.VISIBLE);
 
         coinRepository.loadFreshCoins(1, COIN_LOAD_NO, (coins, isFinalCall) -> {
@@ -102,6 +110,15 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
                 }
             }
         });
+    }
+
+    public void notYetToast() {
+        Context context = getApplicationContext();
+        CharSequence text = "به کجا چنین شتابان...";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     public void noInternetToast() {
