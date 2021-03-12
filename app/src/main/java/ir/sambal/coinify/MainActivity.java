@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        db.close();
         mDroidNet.removeInternetConnectivityChangeListener(this);
     }
 

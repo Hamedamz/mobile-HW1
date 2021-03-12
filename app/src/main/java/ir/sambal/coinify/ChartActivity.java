@@ -99,12 +99,9 @@ public class ChartActivity extends AppCompatActivity {
                         Toast toast = Toast.makeText(getApplicationContext(),
                                 getResources().getString(R.string.coin_not_found), duration);
                         toast.show();
-                        ChartActivity.this.finish();
                         return;
                     }
                 }
-                // retry!
-                ChartActivity.this.loadCoin();
 
             }
         });
@@ -138,6 +135,5 @@ public class ChartActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        db.close();
     }
 }
