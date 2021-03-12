@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import ir.sambal.coinify.Coin;
+import ir.sambal.coinify.R;
 import ir.sambal.coinify.TimestampUtils;
 import ir.sambal.coinify.db.CoinEntity;
 import ir.sambal.coinify.db.CoinDao;
@@ -45,7 +46,12 @@ public class CoinRepository {
                 CoinEntity coinEntity = db.loadById(coinId);
                 Coin coin = coinEntityToCoin(coinEntity);
 
-                callback.success(coin);
+                resultHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.success(coin);
+                    }
+                });
             }
         });
     }
@@ -72,7 +78,15 @@ public class CoinRepository {
                 if (needNetwork && networkStatus == NetworkStatus.CONNECTED) {
                     loadFreshCoins(start, limit, callback);
                 }
-                callback.addCoins(coins, !needNetwork);
+
+                boolean finalNeedNetwork = needNetwork;
+                resultHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.addCoins(coins, !finalNeedNetwork);
+
+                    }
+                });
             }
         });
     }
@@ -90,7 +104,14 @@ public class CoinRepository {
                         String imageURL = (String) details.get("logoURL");
                         coin.setImageURL(imageURL);
                         db.updateImage(coin.getId(), imageURL);
-                        callback.getImageURL((String) details.get("logoURL"));
+
+                        resultHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.getImageURL((String) details.get("logoURL"));
+
+                            }
+                        });
                     }
 
                     @Override
@@ -127,13 +148,27 @@ public class CoinRepository {
                             coinEntities[i] = coinEntity;
                         }
                         db.insertAll(coinEntities);
-                        callback.addCoins(coins, true);
+
+                        resultHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.addCoins(coins, true);
+
+                            }
+                        });
                     }
 
                     @Override
                     public void onError() {
                         // nothing or retry?!
-                        callback.addCoins(new Coin[0], true);
+
+                        resultHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.addCoins(new Coin[0], true);
+
+                            }
+                        });
                     }
                 });
             }

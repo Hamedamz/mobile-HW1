@@ -59,12 +59,12 @@ public class ChartActivity extends AppCompatActivity {
                 synchronized (ChartActivity.this) {
                     c.setCandles(Arrays.asList(candles));
                 }
-                runOnUiThread(() -> {
-                    CandleChart.draw(this, c, CandleRequest.Range.weekly);
-                    if (isFinalCall) {
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
+//                runOnUiThread(() -> {
+                CandleChart.draw(this, c, CandleRequest.Range.weekly);
+                if (isFinalCall) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
+//                });
             });
 
             chartToggle.setOnChangeListener(position -> {
