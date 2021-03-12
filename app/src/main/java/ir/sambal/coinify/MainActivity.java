@@ -1,9 +1,12 @@
 package ir.sambal.coinify;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.os.HandlerCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,9 +21,14 @@ import ir.sambal.coinify.db.AppDatabase;
 import ir.sambal.coinify.network.CoinRequest;
 import ir.sambal.coinify.network.CoinifyOkHttp;
 import ir.sambal.coinify.repository.CoinRepository;
+import ir.sambal.coinify.thread.ThreadPoolManager;
 import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity {
+
+    private Handler mainThreadHandler  = HandlerCompat.createAsync(Looper.getMainLooper());
+    private ThreadPoolManager threadPoolManager = ThreadPoolManager.getInstance();;
+
     private ProgressBar progressBar;
     private AppDatabase db;
     private ListView listView;
@@ -43,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         db = AppDatabase.getInstance(this);
         OkHttpClient coinMarketClient = CoinifyOkHttp.create(this);
         CoinRequest coinRequest = new CoinRequest(coinMarketClient);
-        coinRepository = new CoinRepository(db.coinDao(), coinRequest);
+        coinRepository = new CoinRepository(db.coinDao(), coinRequest, threadPoolManager, mainThreadHandler);
 
         listView = findViewById(R.id.coin_list);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
