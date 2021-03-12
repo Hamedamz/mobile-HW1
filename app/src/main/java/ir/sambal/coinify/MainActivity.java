@@ -6,8 +6,6 @@ import androidx.core.os.HandlerCompat;
 import android.content.Context;
 import android.content.Intent;
 
-import android.net.Network;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,7 +13,6 @@ import android.os.SystemClock;
 
 import android.view.View;
 
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -25,8 +22,6 @@ import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import ir.sambal.coinify.db.AppDatabase;
 import ir.sambal.coinify.network.CoinRequest;
@@ -49,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
 
     public static final int COIN_LOAD_NO = 10;
 
-    private final List<Coin> coins = new ArrayList<>();
+    private CoinAdapter coins;
 
     private DroidNet mDroidNet;
     public NetworkStatus networkStatus;
@@ -73,12 +68,11 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
         coinRepository = new CoinRepository(db.coinDao(), coinRequest, threadPoolManager, mainThreadHandler);
 
         listView = findViewById(R.id.coin_list);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                R.layout.coin_card, R.id.coin_name, new String[]{});
-        listView.setAdapter(adapter);
+        coins = new CoinAdapter(this, new ArrayList<>());
+        listView.setAdapter(coins);
 
         listView.setOnItemClickListener((adapterView, view, position, l) -> {
-            loadChartActivity(this.coins.get(position).getId());
+            loadChartActivity(this.coins.getItem(position).getId());
         });
 
         loadMoreCoins();
@@ -157,12 +151,10 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
                 addOrUpdateCoin(coin);
             }
 
-            Collections.sort(coins, (c1, c2) -> Double.compare(c2.getMarketCap(), c1.getMarketCap()));
+            coins.sort((c1, c2) -> Double.compare(c2.getMarketCap(), c1.getMarketCap()));
 
-            final CoinAdapter adapter = new CoinAdapter(this, coins);
-            listView.setAdapter(adapter);
-            for (int i = 0; i < coins.size(); i++) {
-                Coin coin = coins.get(i);
+            for (int i = 0; i < coins.getCount(); i++) {
+                Coin coin = coins.getItem(i);
                 int finalI = i;
                 coinRepository.fetchCoinImageURL(coin, (imageURL -> {
                     View childView = listView.getChildAt(finalI);
@@ -177,25 +169,27 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
     private void addOrUpdateCoin(Coin coin) {
         synchronized (coins) {
             // TODO: Can we simplify it with replace?!
-            for (int i = 0; i < coins.size(); i++) {
-                if (coins.get(i).getId() == coin.getId()) {
-                    if (coins.get(i).getLastUpdated().before(coin.getLastUpdated())) {
+            for (int i = 0; i < coins.getCount(); i++) {
+                if (coins.getItem(i).getId() == coin.getId()) {
+                    if (coins.getItem(i).getLastUpdated().before(coin.getLastUpdated())) {
                         // use old image is coin has image TODO: it should not be here :-\
-                        if (coins.get(i).getImageURL() == null && coin.getImageURL() != null) {
-                            coin.setImageURL(coins.get(i).getImageURL());
+                        if (coins.getItem(i).getImageURL() == null && coin.getImageURL() != null) {
+                            coin.setImageURL(coins.getItem(i).getImageURL());
                         }
-                        coins.set(i, coin);
+                        coins.remove(coins.getItem(i));
+                        coins.insert(coin, i);
                         return;
                     }
                 }
             }
             coins.add(coin);
+
         }
     }
 
     public void loadMoreCoins() {
         progressBar.setVisibility(View.VISIBLE);
-        int index = this.coins.size() + 1;
+        int index = this.coins.getCount() + 1;
         coinRepository.getCoins(index, COIN_LOAD_NO, new CoinRepository.CoinsResponseCallback() {
             @Override
             public void success(Coin[] coins, boolean isFinalCall) {
