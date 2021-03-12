@@ -73,6 +73,7 @@ public class CoinRepository {
                     loadFreshCoins(start, limit, callback);
                 }
                 callback.addCoins(coins, !needNetwork);
+            }
         });
     }
 
