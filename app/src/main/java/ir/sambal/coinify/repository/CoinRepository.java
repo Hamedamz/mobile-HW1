@@ -10,6 +10,7 @@ import ir.sambal.coinify.TimestampUtils;
 import ir.sambal.coinify.db.CoinEntity;
 import ir.sambal.coinify.db.CoinDao;
 import ir.sambal.coinify.network.CoinRequest;
+import ir.sambal.coinify.network.NetworkStatus;
 
 public class CoinRepository {
     private final CoinDao db;
@@ -39,7 +40,7 @@ public class CoinRepository {
     }
 
 
-    public void getCoins(int start, int limit, CoinsResponseCallback callback) {
+    public void getCoins(int start, int limit, NetworkStatus networkStatus, CoinsResponseCallback callback) {
         Thread cacheThread = new Thread(() -> {
             List<CoinEntity> coinEntities = db.getAll(start - 1, limit);
             boolean needNetwork = coinEntities.size() < limit;
@@ -54,7 +55,7 @@ public class CoinRepository {
                     needNetwork = true;
                 }
             }
-            if (needNetwork) {
+            if (needNetwork && networkStatus == NetworkStatus.CONNECTED) {
                 loadFreshCoins(start, limit, callback);
             }
             callback.addCoins(coins, !needNetwork);

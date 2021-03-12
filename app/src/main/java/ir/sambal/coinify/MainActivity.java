@@ -2,13 +2,19 @@ package ir.sambal.coinify;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Network;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.droidnet.DroidListener;
+import com.droidnet.DroidNet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,10 +23,11 @@ import java.util.List;
 import ir.sambal.coinify.db.AppDatabase;
 import ir.sambal.coinify.network.CoinRequest;
 import ir.sambal.coinify.network.CoinifyOkHttp;
+import ir.sambal.coinify.network.NetworkStatus;
 import ir.sambal.coinify.repository.CoinRepository;
 import okhttp3.OkHttpClient;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DroidListener {
     private ProgressBar progressBar;
     private AppDatabase db;
     private ListView listView;
@@ -30,10 +37,15 @@ public class MainActivity extends AppCompatActivity {
 
     private final List<Coin> coins = new ArrayList<>();
 
+    private DroidNet mDroidNet;
+    public NetworkStatus networkStatus;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DroidNet.init(this);
 
         setContentView(R.layout.activity_main);
 
@@ -60,6 +72,14 @@ public class MainActivity extends AppCompatActivity {
         Button reloadBtn = findViewById(R.id.reload_btn);
         reloadBtn.setOnClickListener(v -> reloadCoins());
 
+        mDroidNet = DroidNet.getInstance();
+        mDroidNet.addInternetConnectivityListener(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDroidNet.removeInternetConnectivityChangeListener(this);
     }
 
     private void loadChartActivity(int coinId) {
@@ -82,6 +102,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void noInternetToast() {
+        Context context = getApplicationContext();
+        CharSequence text = "No Network!";
+        int duration = Toast.LENGTH_LONG;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
 
@@ -134,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
     public void loadMoreCoins() {
         progressBar.setVisibility(View.VISIBLE);
         int index = this.coins.size() + 1;
-        coinRepository.getCoins(index, COIN_LOAD_NO, (coins, isFinalCall) -> {
+        coinRepository.getCoins(index, COIN_LOAD_NO, networkStatus, (coins, isFinalCall) -> {
             synchronized (MainActivity.this.coins) {
                 updateCoins(coins);
                 if (isFinalCall) {
@@ -142,5 +171,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onInternetConnectivityChanged(boolean isConnected) {
+        Button reloadBtn = findViewById(R.id.reload_btn);
+        if (isConnected) {
+            networkStatus = NetworkStatus.CONNECTED;
+            reloadBtn.setEnabled(true);
+        } else {
+            networkStatus = NetworkStatus.NOT_CONNECTED;
+            reloadBtn.setEnabled(false);
+            noInternetToast();
+        }
     }
 }
