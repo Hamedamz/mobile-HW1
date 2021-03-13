@@ -33,12 +33,13 @@ import ir.sambal.coinify.network.CoinRequest;
 import ir.sambal.coinify.network.CoinifyOkHttp;
 import ir.sambal.coinify.network.NetworkStatus;
 import ir.sambal.coinify.repository.CoinRepository;
+import ir.sambal.coinify.repository.GlobalRepositoryErrors;
 import ir.sambal.coinify.thread.ThreadPoolManager;
 import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity implements DroidListener {
 
-    private Handler mainThreadHandler  = HandlerCompat.createAsync(Looper.getMainLooper());
+    private Handler mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
     private ThreadPoolManager threadPoolManager = ThreadPoolManager.getInstance();
 
     private ProgressBar progressBar;
@@ -111,22 +112,29 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        coinRepository.loadFreshCoins(1, COIN_LOAD_NO, (coins, isFinalCall) -> {
-            synchronized (MainActivity.this.coins) {
-                MainActivity.this.coins.clear();
-                updateCoins(coins);
-                if (isFinalCall) {
-//                    runOnUiThread(() -> {
+        coinRepository.loadFreshCoins(1, COIN_LOAD_NO, new CoinRepository.CoinsResponseCallback() {
+            @Override
+            public void success(Coin[] coins, boolean isFinalCall) {
+                synchronized (MainActivity.this.coins) {
+                    MainActivity.this.coins.clear();
+                    updateCoins(coins);
+                    if (isFinalCall) {
                         progressBar.setVisibility(View.INVISIBLE);
-//                    });
+                    }
                 }
+            }
+
+            @Override
+            public void error(int errorNumber) {
+                GlobalRepositoryErrors.handleGlobalError(getApplicationContext(), errorNumber);
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
 
     public void notYetToast() {
         Context context = getApplicationContext();
-        CharSequence text = "به کجا چنین شتابان...";
+        CharSequence text = getString(R.string.please_wait);
         int duration = Toast.LENGTH_SHORT;
 
         Toast toast = Toast.makeText(context, text, duration);
@@ -135,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
 
     public void noInternetToast() {
         Context context = getApplicationContext();
-        CharSequence text = "No Network!";
+        CharSequence text = getString(R.string.no_network);
         int duration = Toast.LENGTH_LONG;
 
         Toast toast = Toast.makeText(context, text, duration);
@@ -151,22 +159,18 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
 
             Collections.sort(coins, (c1, c2) -> Double.compare(c2.getMarketCap(), c1.getMarketCap()));
 
-//            runOnUiThread(() -> {
-                final CoinAdapter adapter = new CoinAdapter(this, coins);
-                listView.setAdapter(adapter);
-                for (int i = 0; i < coins.size(); i++) {
-                    Coin coin = coins.get(i);
-                    int finalI = i;
-                    coinRepository.fetchCoinImageURL(coin, (imageURL -> {
-//                        runOnUiThread(() -> {
-                            View childView = listView.getChildAt(finalI);
-                            if (childView != null) {
-                                listView.getAdapter().getView(finalI, childView, listView);
-                            }
-//                        });
-                    }));
-                }
-//            });
+            final CoinAdapter adapter = new CoinAdapter(this, coins);
+            listView.setAdapter(adapter);
+            for (int i = 0; i < coins.size(); i++) {
+                Coin coin = coins.get(i);
+                int finalI = i;
+                coinRepository.fetchCoinImageURL(coin, (imageURL -> {
+                    View childView = listView.getChildAt(finalI);
+                    if (childView != null) {
+                        listView.getAdapter().getView(finalI, childView, listView);
+                    }
+                }));
+            }
         }
     }
 
@@ -190,18 +194,32 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
     }
 
     public void loadMoreCoins() {
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 2000) {
+            notYetToast();
+            return;
+        }
+        mLastClickTime = SystemClock.elapsedRealtime();
         progressBar.setVisibility(View.VISIBLE);
         int index = this.coins.size() + 1;
-        coinRepository.getCoins(index, COIN_LOAD_NO, networkStatus, (coins, isFinalCall) -> {
-            synchronized (MainActivity.this.coins) {
-                updateCoins(coins);
-                if (isFinalCall) {
-//                    runOnUiThread(() -> progressBar.setVisibility(View.INVISIBLE));
-                    progressBar.setVisibility(View.INVISIBLE);
+        coinRepository.getCoins(index, COIN_LOAD_NO, new CoinRepository.CoinsResponseCallback() {
+            @Override
+            public void success(Coin[] coins, boolean isFinalCall) {
+                synchronized (MainActivity.this.coins) {
+                    updateCoins(coins);
+                    if (isFinalCall) {
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
                 }
+            }
+
+            @Override
+            public void error(int errorNumber) {
+                GlobalRepositoryErrors.handleGlobalError(getApplicationContext(), errorNumber);
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
+
 
     @Override
     public void onInternetConnectivityChanged(boolean isConnected) {

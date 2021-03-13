@@ -23,8 +23,13 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class CandleRequest {
+    static final String tag = "OKHTTP_CandleRequest";
 
-    private OkHttpClient client;
+    public enum RequestError {
+        PARSE_ERROR, BAD_REQUEST, SERVER_ERROR, CONNECTION_ERROR;
+    }
+
+    private final OkHttpClient client;
 
     public CandleRequest(OkHttpClient client) {
         this.client = client;
@@ -50,14 +55,22 @@ public class CandleRequest {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                callback.error();
-                Log.v("OKHTTP", e.getMessage());
+                callback.error(RequestError.CONNECTION_ERROR);
+                Log.w(tag, e);
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
-                final String myResponse = Objects.requireNonNull(response.body()).string();
+                if (response.code() >= 500) {
+                    callback.error(RequestError.SERVER_ERROR);
+                    return;
+                }
+                if (response.code() >= 400) {
+                    callback.error(RequestError.BAD_REQUEST);
+                    return;
+                }
 
+                final String myResponse = Objects.requireNonNull(response.body()).string();
                 try {
                     JSONArray json = new JSONArray(myResponse);
                     Candle[] candles = new Candle[json.length()];
@@ -73,7 +86,7 @@ public class CandleRequest {
                     callback.success(candles);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    callback.error();
+                    callback.error(RequestError.PARSE_ERROR);
                 }
             }
         });
@@ -81,6 +94,8 @@ public class CandleRequest {
 
     public interface CandlesLoadedCallback {
         void success(Candle... candles);
-        default void error() {}
+
+        default void error(RequestError error) {
+        }
     }
 }
