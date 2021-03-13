@@ -87,6 +87,7 @@ public class ChartActivity extends AppCompatActivity {
             public void success(Coin c) {
                 coin = c;
                 progressBar.setVisibility(View.INVISIBLE);
+                setTitle(coin.getName() + "'s Chart");
                 fetchCoinCandles();
             }
 
@@ -102,6 +103,7 @@ public class ChartActivity extends AppCompatActivity {
                         return;
                     }
                 }
+                progressBar.setVisibility(View.INVISIBLE);
 
             }
         });
@@ -126,8 +128,12 @@ public class ChartActivity extends AppCompatActivity {
                 if (!GlobalRepositoryErrors.handleGlobalError(getApplicationContext(), errorNumber)) {
                     if (errorNumber == CandleRepository.CandlesResponseCallback.NO_CANDLES_FOUND) {
                         ((CandleStickChart) findViewById(R.id.candle_stick_chart)).setNoDataText(getResources().getString(R.string.chart_no_data));
+                        findViewById(R.id.candle_stick_chart).invalidate();
+                        Toast toast = Toast.makeText(getApplicationContext(), R.string.no_candles_found, Toast.LENGTH_LONG);
+                        toast.show();
                     }
                 }
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
     }

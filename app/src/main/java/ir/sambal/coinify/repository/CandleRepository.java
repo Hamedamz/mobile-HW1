@@ -50,7 +50,7 @@ public class CandleRepository {
             @Override
             public void success(Candle... candles) {
                 if (candles.length == 0) {
-                    callback.error(CandlesResponseCallback.NO_CANDLES_FOUND);
+                    resultHandler.post(() -> callback.error(CandlesResponseCallback.NO_CANDLES_FOUND));
                     return;
                 }
                 CandleEntity[] candleEntities = new CandleEntity[candles.length];

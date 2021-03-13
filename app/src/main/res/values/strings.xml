@@ -11,4 +11,5 @@
     <string name="unknown_error_contact_support">یک خطای ناشناخته رخ داده است :-\\ لطفا دوباره تلاش کنید و یا با پشتیبانی تماس بگیرید.</string>
     <string name="please_wait">به کجا چنین شتابان...</string>
     <string name="no_network">No Network!</string>
+    <string name="no_candles_found">داده‌ای برای این سکه یافت نشد :(</string>
 </resources>

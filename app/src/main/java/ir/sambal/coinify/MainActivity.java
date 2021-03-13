@@ -194,6 +194,11 @@ public class MainActivity extends AppCompatActivity implements DroidListener {
     }
 
     public void loadMoreCoins() {
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 2000) {
+            notYetToast();
+            return;
+        }
+        mLastClickTime = SystemClock.elapsedRealtime();
         progressBar.setVisibility(View.VISIBLE);
         int index = this.coins.size() + 1;
         coinRepository.getCoins(index, COIN_LOAD_NO, new CoinRepository.CoinsResponseCallback() {
